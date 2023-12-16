@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoadingScreen from './pages/Loading';
 import HomeScreen from './pages/Home';
+import PokedexScreen from './pages/Pokedex';
 
 const Stack = createStackNavigator();
 
@@ -40,6 +41,10 @@ const App = () => {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
+        />
+        <Stack.Screen
+          name="Pokedex"
+          component={PokedexScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
