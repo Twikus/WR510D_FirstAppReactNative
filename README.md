@@ -1,1 +1,1 @@
-# WR510D_FirstAppReactNative
+# WR510D_Pokedex
