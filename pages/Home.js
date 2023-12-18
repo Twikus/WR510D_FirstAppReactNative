@@ -1,17 +1,14 @@
-import { View, Text, StyleSheet } from 'react-native';
-import OnBoarding from '../components/Home/OnBoarding';
+import { View, Text, StyleSheet } from "react-native";
+import OnBoardingViews from "../views/Home/OnBoardingViews";
 
 const HomeScreen = () => {
+  return (
+    <View style={styles.container}>
+      <OnBoardingViews />
+    </View>
+  );
+};
 
-    return (
-        <View style={styles.container}>
-            <OnBoarding />
-        </View>
-    );
-}
-
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
 
 export default HomeScreen;

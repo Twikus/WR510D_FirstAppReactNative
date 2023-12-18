@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     flexDirection: "row",
     position: "relative",
+
     left: {
       width: 328,
       height: 102,
