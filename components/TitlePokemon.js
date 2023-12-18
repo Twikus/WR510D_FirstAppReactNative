@@ -6,31 +6,29 @@ import { colors } from '../assets/styles/variables';
 const TitlePokemon = ({ name, url }) => {
     const id = url.split('/')[url.split('/').length - 2];
     const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
-
-    const [data, setData] = useState([]);
-    const [types, setTypes] = useState([]);
-    const typesList = [];
     const typeImages = {
-        bug: require('../assets/img/types/bug.png'),
-        dark: require('../assets/img/types/dark.png'),
+        water: require('../assets/img/types/water.png'),
         dragon: require('../assets/img/types/dragon.png'),
         electric: require('../assets/img/types/electric.png'),
         fairy: require('../assets/img/types/fairy.png'),
-        fighting: require('../assets/img/types/fighting.png'),
-        fire: require('../assets/img/types/fire.png'),
-        flying: require('../assets/img/types/flying.png'),
         ghost: require('../assets/img/types/ghost.png'),
-        grass: require('../assets/img/types/grass.png'),
-        ground: require('../assets/img/types/ground.png'),
+        fire: require('../assets/img/types/fire.png'),
         ice: require('../assets/img/types/ice.png'),
+        grass: require('../assets/img/types/grass.png'),
+        bug: require('../assets/img/types/bug.png'),
+        fighting: require('../assets/img/types/fighting.png'),
         normal: require('../assets/img/types/normal.png'),
-        poison: require('../assets/img/types/poison.png'),
-        psychic: require('../assets/img/types/psychic.png'),
-        rock: require('../assets/img/types/rock.png'),
+        dark: require('../assets/img/types/dark.png'),
         steel: require('../assets/img/types/steel.png'),
-        water: require('../assets/img/types/water.png'),
+        rock: require('../assets/img/types/rock.png'),
+        psychic: require('../assets/img/types/psychic.png'),
+        ground: require('../assets/img/types/ground.png'),
+        poison: require('../assets/img/types/poison.png'),
+        flying: require('../assets/img/types/flying.png'),
     };
 
+    const [data, setData] = useState([]);
+    const [types, setTypes] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,25 +46,9 @@ const TitlePokemon = ({ name, url }) => {
 
     const nameCapitalized = data.name ? data.name.charAt(0).toUpperCase() + name.slice(1) : '';
 
-    const renderTypes = () => {
-        return types.map((type, index) => {
-            const typeCapitalized = type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1);
-            const image = findImageByType(type.type.name);
-            const backgroundColor = findColorByType(type.type.name);
-
-            return (
-                <View key={index} style={[styles.card.left.types.container, { backgroundColor }]}>
-                    <View style={styles.card.left.types.container.imgContainer}>
-                        <Image
-                            style={styles.card.left.types.container.imgContainer.img}
-                            source={image}
-                        />
-                    </View>
-                    <Text style={styles.card.left.types.container.p}>{typeCapitalized}</Text>
-                </View>
-            );
-        });
-    };
+    // Utilisez seulement le premier type pour la couleur de fond de la carte
+    const mainType = types.length > 0 ? types[0].type.name : 'default';
+    const backgroundColor = `${colors.types[mainType] || colors.types.default}33`; // Ajoutez "33" pour l'opacité
 
     const findImageByType = (type) => {
         if (typeImages[type]) {
@@ -76,13 +58,32 @@ const TitlePokemon = ({ name, url }) => {
         }
     };
 
-    const findColorByType = (type) => {
-        const typeColor = colors.types[type];
-        return typeColor || colors.types.default;
+    const renderTypes = () => {
+        return (
+            <View style={styles.card.left.types.container}>
+                {types.map((type, index) => {
+                    const typeCapitalized = type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1);
+                    const image = findImageByType(type.type.name);
+                    const backgroundColor = colors.types[type.type.name] || colors.types.default;
+
+                    return (
+                        <View key={index} style={[styles.card.left.types.bubble, { backgroundColor }]}>
+                            <View style={styles.card.left.types.bubble.imgContainer}>
+                                <Image
+                                    style={[styles.card.left.types.bubble.img, { resizeMode: 'contain' }]}
+                                    source={image}
+                                />
+                            </View>
+                            <Text style={styles.card.left.types.bubble.text}>{typeCapitalized}</Text>
+                        </View>
+                    );
+                })}
+            </View>
+        );
     };
 
     return (
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor }]}>
             <View style={styles.card.left}>
                 <Text style={styles.card.left.id}>N°{data.id}</Text>
                 <Text style={styles.card.left.name}>{nameCapitalized}</Text>
@@ -102,16 +103,8 @@ const styles = StyleSheet.create({
         height: 102,
         marginBottom: 12,
         borderRadius: 15,
-        backgroundColor: '#EDF6EC',
         flexDirection: 'row',
         position: 'relative',
-        image: {
-            width: 106,
-            height: 82,
-            marginLeft: 'auto',
-            marginRight: 0,
-            marginTop: 10,
-        },
         left: {
             width: 328,
             height: 102,
@@ -131,47 +124,44 @@ const styles = StyleSheet.create({
             types: {
                 flexDirection: 'row',
                 marginTop: 5,
-
                 container: {
-                    paddingLeft: 5,
-                    paddingRight: 5,
-                    paddingTop: 2.5,
-                    paddingBottom: 2.5,
+                    flexDirection: 'row',
                     marginRight: 10,
+                },
+                bubble: {
                     borderRadius: 50,
-                    backgroundColor: '#fff',
+                    marginRight: 10,
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-
-                    p: {
-                        fontFamily: 'poppins-medium',
-                        fontSize: 12,
-                    },
-
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    
                     imgContainer: {
                         backgroundColor: '#fff',
-                        paddingBottom: 5,
-                        paddingLeft: 5,
-                        paddingRight: 5,
-                        paddingTop: 5,
                         borderRadius: 50,
                         marginRight: 5,
-
-                        img: {
-                            width: 15,
-                            height: 15,
-                            resizeMode: 'contain',
-                        },
+                    },
+                    img: {
+                        width: 15,
+                        height: 15,
+                        marginLeft: 3,
+                        marginRight: 3,
+                        marginTop: 3,
+                        marginBottom: 3,
+                    },
+                    text: {
+                        // Style pour le texte à l'intérieur de la bulle
                     },
                 },
             },
         },
-        right: {
-            width: 126,
-            height: 102,
-            position: 'absolute',
-            right: 0,
+        image: {
+            width: 106,
+            height: 82,
+            marginLeft: 'auto',
+            marginRight: 0,
+            marginTop: 10,
         },
     },
 });
