@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
 import { colors } from "../assets/styles/variables";
+import { useNavigation } from "@react-navigation/native";
 
 const TitlePokemon = ({ name, url }) => {
   const id = url.split("/")[url.split("/").length - 2];
@@ -27,8 +29,10 @@ const TitlePokemon = ({ name, url }) => {
     flying: require("../assets/img/types/flying.png"),
   };
 
+  const navigation = useNavigation();
+
   const [data, setData] = useState([]);
-  const [types, setTypes] = useState([]);
+  const [mainType, setMainType] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +41,7 @@ const TitlePokemon = ({ name, url }) => {
           `https://pokeapi.co/api/v2/pokemon/${id}`
         );
         setData(response.data);
-        setTypes(response.data.types);
+        setMainType(response.data.types[0].type.name);
       } catch (error) {
         console.log(error);
       }
@@ -50,7 +54,6 @@ const TitlePokemon = ({ name, url }) => {
     ? data.name.charAt(0).toUpperCase() + name.slice(1)
     : "";
 
-  const mainType = types.length > 0 ? types[0].type.name : "default";
   const backgroundColor = `${colors.types[mainType] || colors.types.default}33`;
 
   const findImageByType = (type) => {
@@ -61,54 +64,65 @@ const TitlePokemon = ({ name, url }) => {
     }
   };
 
-  const renderTypes = () => {
-    return (
-      <View style={styles.card.left.types.container}>
-        {types.map((type, index) => {
-          const typeCapitalized =
-            type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1);
-          const image = findImageByType(type.type.name);
-          const backgroundColor =
-            colors.types[type.type.name] || colors.types.default;
+  const gotToDetails = () => {
+    navigation.navigate("Details", { id: data.id });
+  };
 
-          return (
-            <View
-              key={index}
-              style={[styles.card.left.types.bubble, { backgroundColor }]}
-            >
-              <View style={styles.card.left.types.bubble.imgContainer}>
-                <Image
-                  style={[
-                    styles.card.left.types.bubble.img,
-                    { resizeMode: "contain" },
-                  ]}
-                  source={image}
-                />
+  const renderTypes = () => {
+    if (data.types && data.types.length > 0) {
+      return (
+        <View style={styles.card.left.types.container}>
+          {data.types.map((type, index) => {
+            const typeCapitalized =
+              type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1);
+
+            const image = findImageByType(type.type.name);
+            const backgroundColor =
+              colors.types[type.type.name] || colors.types.default;
+
+            return (
+              <View
+                key={index}
+                style={[styles.card.left.types.bubble, { backgroundColor }]}
+              >
+                <View style={styles.card.left.types.bubble.imgContainer}>
+                  <Image
+                    style={[
+                      styles.card.left.types.bubble.img,
+                      { resizeMode: "contain" },
+                    ]}
+                    defaultSource={image}
+                    source={image}
+                  />
+                </View>
+                <Text style={styles.card.left.types.bubble.text}>
+                  {typeCapitalized}
+                </Text>
               </View>
-              <Text style={styles.card.left.types.bubble.text}>
-                {typeCapitalized}
-              </Text>
-            </View>
-          );
-        })}
-      </View>
-    );
+            );
+          })}
+        </View>
+      );
+    } else {
+      return null;
+    }
   };
 
   return (
-    <View style={[styles.card, { backgroundColor }]}>
-      <View style={styles.card.left}>
-        <Text style={styles.card.left.id}>N°{data.id}</Text>
-        <Text style={styles.card.left.name}>{nameCapitalized}</Text>
-        <View style={styles.card.left.types}>
-          {types.length > 0 && renderTypes()}
+    <TouchableOpacity onPress={() => gotToDetails()}>
+      <View style={[styles.card, { backgroundColor }]}>
+        <View style={styles.card.left}>
+          <Text style={styles.card.left.id}>N°{data.id}</Text>
+          <Text style={styles.card.left.name}>{nameCapitalized}</Text>
+          <View style={styles.card.left.types}>{renderTypes()}</View>
         </View>
+        <Image
+          style={styles.card.image}
+          defaultSource={require("../assets/img/baseImage.png")}
+          source={{ uri: image || "https://via.placeholder.com/106x82" }}
+        />
       </View>
-      <Image
-        style={styles.card.image}
-        source={{ uri: image || "https://via.placeholder.com/106x82" }}
-      />
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -167,7 +181,9 @@ const styles = StyleSheet.create({
             marginBottom: 3,
           },
           text: {
-            // Style pour le texte à l'intérieur de la bulle
+            fontFamily: "poppins-medium",
+            fontSize: 12,
+            color: "#fff",
           },
         },
       },
