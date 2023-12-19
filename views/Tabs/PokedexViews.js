@@ -26,7 +26,7 @@ const PokedexViews = () => {
       const response = await listPokemon;
       setData(response.data.results);
       setFullData(response.data.results);
-      console.log(response.data.results);
+      // console.log(response.data.results);
     } catch (error) {
       setError(error);
       console.log(error);
