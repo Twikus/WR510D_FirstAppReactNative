@@ -84,8 +84,6 @@ const DetailsScreen = ({ route }) => {
     
     fetchData();
     fetchSpecies();
-
-    console.log(species.gender_rate)
   }, [1]);
 
   let genderFemaleRate = 0;
