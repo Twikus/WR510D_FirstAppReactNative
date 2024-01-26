@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "../assets/styles/variables";
@@ -84,7 +84,17 @@ const DetailsScreen = ({ route }) => {
     
     fetchData();
     fetchSpecies();
+
+    console.log(species.gender_rate)
   }, [1]);
+
+  let genderFemaleRate = 0;
+  let genderMaleRate = 0;
+
+  if (species.gender_rate !== -1) {
+      genderFemaleRate = (species.gender_rate / 8) * 100;
+      genderMaleRate = ((8 - species.gender_rate) / 8) * 100;
+  }
 
   // if species is not empty, get the description of the pokemon
   let pokemonDescription = species.flavor_text_entries
@@ -152,7 +162,8 @@ const DetailsScreen = ({ route }) => {
   };
 
   return (
-    <View style={style}>
+    // { data && species &&
+    <ScrollView style={style}>
       <View style={style.header}>
         <LinearGradient
           colors={[color1, color2]}
@@ -217,16 +228,37 @@ const DetailsScreen = ({ route }) => {
           <View style={style.body.statsContainer.row}>
             <View style={style.body.statsContainer.statContainer}>
               <Text style={style.body.statsContainer.statContainer.title}>
-                <Icon source="account-group" size={20} color="rgba(0, 0, 0, 0.60)"/> CATEGORY
+                <Icon source="account-group" size={20} color="rgba(0, 0, 0, 0.60)"/> HABITAT
               </Text>
               <Text style={style.body.statsContainer.statContainer.stat}>
-                
+                {species.habitat ? species.habitat.name.charAt(0).toUpperCase() + species.habitat.name.slice(1) : "Unknown"}
               </Text>
+            </View>
+          </View>
+          <View style={style.body.statsContainer.row}>
+            <View style={style.body.statsContainer.genderRate}>
+              <Text style={style.body.statsContainer.statContainer.title}>
+                GENDER RATE
+              </Text>
+              <View style={style.body.statsContainer.genderRate.progressBarBase}>
+                <View style={[style.body.statsContainer.genderRate.progressBar, {width: `${genderMaleRate}%`}]}></View>
+              </View>
+              <View style={style.body.statsContainer.genderRate.textContainer}>
+                <View style={style.body.statsContainer.genderRate.textContainer.row}>
+                  <Icon source="gender-male" size={15} color="rgba(0, 0, 0, 0.70)"/>
+                  <Text>{genderMaleRate} %</Text>
+                </View>
+                <View style={style.body.statsContainer.genderRate.textContainer.row}>
+                  <Icon source="gender-female" size={15} color="rgba(0, 0, 0, 0.70)"/>
+                  <Text>{genderFemaleRate} %</Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
+    // }
   );
 };
 
@@ -384,7 +416,6 @@ const styles = StyleSheet.create({
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "space-between",
-          marginBottom: 20,
 
           title: {
             fontFamily: "poppins-regular",
@@ -403,6 +434,38 @@ const styles = StyleSheet.create({
             borderWidth: 1,
             borderColor: "rgba(0, 0, 0, 0.10)",
             borderRadius: 15,
+          },
+        },
+
+        genderRate: {
+          width: '100%',
+          height: 70,
+          justifyContent: 'center',
+          alignItems: 'center',
+
+          progressBarBase: {
+            width: '90%',
+            height: 10,
+            backgroundColor: '#FF7596',
+            borderRadius: 50,
+          },
+
+          progressBar: {
+            height: 10,
+            backgroundColor: '#2551C3',
+            borderRadius: 50,
+          },
+
+          textContainer: {
+            width: '90%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 5,
+
+            row: {
+              flexDirection: 'row',
+              alignItems: 'center',
+            },
           },
         },
       },
