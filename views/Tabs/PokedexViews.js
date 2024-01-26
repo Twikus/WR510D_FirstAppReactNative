@@ -15,18 +15,17 @@ const PokedexViews = () => {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [offset, setOffset] = useState(0);
 
   const API_ENDPOINT = "https://pokeapi.co/api/v2/pokemon/";
-
-  const listPokemon = axios.get(API_ENDPOINT);
 
   const fetchPokemon = async () => {
     try {
       setIsLoading(true);
-      const response = await listPokemon;
+      const response = await axios.get(`${API_ENDPOINT}?offset=${offset}&limit=20`);
       setData(response.data.results);
       setFullData(response.data.results);
-      // console.log(response.data.results);
+      setOffset(offset + 20);
     } catch (error) {
       setError(error);
       console.log(error);
@@ -34,6 +33,18 @@ const PokedexViews = () => {
       setIsLoading(false);
     }
   };
+
+  const fetchMorePokemon = async () => {
+    try {
+      const response = await axios.get(`${API_ENDPOINT}?offset=${offset}&limit=20`);
+      setData(prevData => [...prevData, ...response.data.results]);
+      setFullData(prevData => [...prevData, ...response.data.results]);
+      setOffset(offset + 20);
+    } catch (error) {
+      setError(error);
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     fetchPokemon();
@@ -98,6 +109,8 @@ const PokedexViews = () => {
             <TitlePokemon name={item.name} url={item.url} />
           )}
           keyExtractor={(item) => item.name}
+          onEndReached={fetchMorePokemon}
+          onEndReachedThreshold={0.5}
         ></FlatList>
       </View>
     </View>
