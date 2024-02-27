@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Icon } from "react-native-paper";
 
+import EvolutionComponent from "../components/EvolutionComponent";
+
 const DetailsScreen = ({ route }) => {
   const style = styles.container;
   const navigation = useNavigation();
@@ -55,6 +57,7 @@ const DetailsScreen = ({ route }) => {
 
   const [data, setData] = useState([]);
   const [species, setSpecies] = useState([]);
+  const [evolutionChain, setEvolutionChain] = useState([]);
   const [mainType, setMainType] = useState("");
 
   useEffect(() => {
@@ -81,9 +84,22 @@ const DetailsScreen = ({ route }) => {
         console.log(error);
       }
     };
-    
+
+    const fetchEvolutionChain = async (url) => {
+      try {
+        const response = await axios.get(
+          url
+        );
+        setEvolutionChain(response.data);
+        console.log('evolve : ' + response.data.chain.species.name);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     fetchData();
     fetchSpecies();
+    fetchEvolutionChain(species.evolution_chain?.url)
   }, [1]);
 
   // if species is not empty, get the description of the pokemon
@@ -107,6 +123,10 @@ const DetailsScreen = ({ route }) => {
       return images.default;
     }
   };
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
   const renderTypes = () => {
     if (data.types && data.types.length > 0) {
@@ -220,10 +240,14 @@ const DetailsScreen = ({ route }) => {
                 <Icon source="account-group" size={20} color="rgba(0, 0, 0, 0.60)"/> CATEGORY
               </Text>
               <Text style={style.body.statsContainer.statContainer.stat}>
-                
+                {species.habitat ? capitalizeFirstLetter(species.habitat.name) : "Unknown"}
               </Text>
             </View>
           </View>
+        </View>
+
+        <View style={style.body.evolutions}>
+          <EvolutionComponent chain={evolutionChain} />
         </View>
       </View>
     </View>
