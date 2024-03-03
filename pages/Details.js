@@ -7,8 +7,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Icon } from "react-native-paper";
 
-import EvolutionComponent from "../components/EvolutionComponent";
-
 const DetailsScreen = ({ route }) => {
   const style = styles.container;
   const navigation = useNavigation();
@@ -57,7 +55,6 @@ const DetailsScreen = ({ route }) => {
 
   const [data, setData] = useState([]);
   const [species, setSpecies] = useState([]);
-  const [evolutionChain, setEvolutionChain] = useState([]);
   const [mainType, setMainType] = useState("");
 
   useEffect(() => {
@@ -85,21 +82,8 @@ const DetailsScreen = ({ route }) => {
       }
     };
 
-    const fetchEvolutionChain = async (url) => {
-      try {
-        const response = await axios.get(
-          url
-        );
-        setEvolutionChain(response.data);
-        console.log('evolve : ' + response.data.chain.species.name);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
     fetchData();
     fetchSpecies();
-    fetchEvolutionChain(species.evolution_chain?.url)
   }, [1]);
 
   let genderFemaleRate = 0;
@@ -118,7 +102,7 @@ const DetailsScreen = ({ route }) => {
   pokemonDescription = pokemonDescription.replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, " ");
 
   const nameCapitalized = data.name
-    ? data.name.charAt(0).toUpperCase() + data.name.slice(1)
+    ? capitalizeFirstLetter(data.name)
     : "";
 
   const color1 = colors.types[mainType];
@@ -273,10 +257,6 @@ const DetailsScreen = ({ route }) => {
               </View>
             </View>
           </View>
-        </View>
-
-        <View style={style.body.evolutions}>
-          <EvolutionComponent chain={evolutionChain} />
         </View>
       </View>
     </ScrollView>
