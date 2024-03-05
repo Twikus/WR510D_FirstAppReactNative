@@ -38,14 +38,11 @@ const RegionViews = () => {
         const response = await axios.get(generation.url);
 
         if (response.data.main_region) {
-          newRegions.push(response.data.main_region);
+          newRegions.push({
+            region: response.data.main_region,
+            generation: generation
+          });
         }
-
-        newRegions = newRegions.map((region) => {
-          return {
-            name: region.name.charAt(0).toUpperCase() + region.name.slice(1),
-          };
-        });
       } catch (error) {
         setError(error);
         console.log('regions :' + error);
@@ -54,10 +51,16 @@ const RegionViews = () => {
       }
     }
 
+    newRegions = newRegions.map(({ region, generation }) => {
+      return {
+        name: region.name.charAt(0).toUpperCase() + region.name.slice(1),
+        generation: generation.name.toUpperCase(),
+      };
+    });
+
     setRegions(newRegions);
     console.log('regions :' + JSON.stringify(newRegions));
   };
-
   useEffect(() => {
     fetchRegion();
   }, []);
@@ -90,7 +93,7 @@ const RegionViews = () => {
         numColumns={1}
         data={regions}
         renderItem={({ item }) => (
-          <Regions style={style.body.list.item} name={item.name} />
+          <Regions style={style.body.list.item} name={item.name} generation={item.generation} />
         )}
         keyExtractor={(item) => item.name}
       ></FlatList>

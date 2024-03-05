@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 
-const Regions = ({ name }) => {
+const Regions = ({ name, generation }) => {
     const style = styles;
 
     const [regions, setRegions] = useState([]);
@@ -50,6 +50,7 @@ const Regions = ({ name }) => {
         <View style={style.body}>
             <View style={style.body.container}>
                 <Text style={style.body.container.name}>{name}</Text>
+                <Text style={style.body.container.generation}>{generation}</Text>
                 {renderRegions()}
             </View>
         </View>
@@ -75,6 +76,16 @@ const styles = StyleSheet.create({
                 left: 30,
                 zIndex: 1,
                 borderRadius: 10,
+            },
+
+            generation: {
+                fontFamily: "poppins-regular",
+                fontSize: 14,
+                color: "rgba(255, 255, 255, 0.7)",
+                position: "absolute",
+                top: "60%",
+                left: 30,
+                zIndex: 1,
             },
 
             imageBackground : {
