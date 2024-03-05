@@ -1,11 +1,11 @@
-import { View, Text } from "react-native";
-import { StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { TextInput } from "react-native-paper";
 import TitlePokemon from "../../components/TitlePokemon";
 import { useState, useEffect } from "react";
 import filter from "lodash.filter";
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PokedexViews = () => {
   const style = styles.container;
@@ -22,10 +22,23 @@ const PokedexViews = () => {
   const fetchPokemon = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${API_ENDPOINT}?offset=${offset}&limit=20`);
-      setData(response.data.results);
-      setFullData(response.data.results);
-      setOffset(offset + 20);
+      const storedData = await AsyncStorage.getItem('pokemonData');
+      const storedOffset = await AsyncStorage.getItem('pokemonOffset');
+      if (storedData !== null && storedOffset !== null) {
+        const data = JSON.parse(storedData);
+        setData(data);
+        setFullData(data);
+        setOffset(parseInt(storedOffset));
+      } else {
+        const response = await axios.get(`${API_ENDPOINT}?offset=${offset}&limit=20`);
+        setData(response.data.results);
+        setFullData(response.data.results);
+        setOffset(offset + 20);
+
+        // Stockez les données et l'offset dans AsyncStorage
+        await AsyncStorage.setItem('pokemonData', JSON.stringify(response.data.results));
+        await AsyncStorage.setItem('pokemonOffset', offset.toString());
+      }
     } catch (error) {
       setError(error);
       console.log(error);
@@ -40,6 +53,10 @@ const PokedexViews = () => {
       setData(prevData => [...prevData, ...response.data.results]);
       setFullData(prevData => [...prevData, ...response.data.results]);
       setOffset(offset + 20);
+
+      // Mettez à jour les données et l'offset dans AsyncStorage
+      await AsyncStorage.setItem('pokemonData', JSON.stringify([...data, ...response.data.results]));
+      await AsyncStorage.setItem('pokemonOffset', offset.toString());
     } catch (error) {
       setError(error);
       console.log(error);
@@ -108,7 +125,7 @@ const PokedexViews = () => {
           renderItem={({ item }) => (
             <TitlePokemon name={item.name} url={item.url} />
           )}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item, index) => item.name + index}
           onEndReached={fetchMorePokemon}
           onEndReachedThreshold={0.5}
         ></FlatList>

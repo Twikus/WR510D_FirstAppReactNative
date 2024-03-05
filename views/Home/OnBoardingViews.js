@@ -1,11 +1,26 @@
-import { View, Image, Text, Button, StyleSheet } from "react-native";
+import { View, Image, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OnBoarding = () => {
   const style = styles.container;
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const clearPokemonData = async () => {
+      try {
+        await AsyncStorage.removeItem('pokemonData');
+      } catch (e) {
+        // Gérer les erreurs éventuelles ici
+        console.error(e);
+      }
+    };
+
+    clearPokemonData();
+  }, []);
 
   return (
     <View style={style}>

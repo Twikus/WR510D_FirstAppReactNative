@@ -59,7 +59,6 @@ const RegionViews = () => {
     });
 
     setRegions(newRegions);
-    console.log('regions :' + JSON.stringify(newRegions));
   };
   useEffect(() => {
     fetchRegion();
