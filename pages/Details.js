@@ -66,7 +66,6 @@ const DetailsScreen = ({ route }) => {
         const favorites = await AsyncStorage.getItem("favorites");
         if (favorites) {
           const favoritesArray = JSON.parse(favorites);
-          console.log(favoritesArray);
           if (favoritesArray.some(fav => fav.id === id)) {
             setIsFavorite(true);
           }
@@ -75,8 +74,6 @@ const DetailsScreen = ({ route }) => {
       catch (error) {
         console.log(error);
       }
-
-      console.log(isFavorite);
     };
 
     fetchFavorite();
@@ -158,8 +155,6 @@ const DetailsScreen = ({ route }) => {
     }).then(() => {
       eventEmitter.emit('refreshFavorites');
     });
-
-    console.log("removed : ", id);
   }
 
   function addFavorite() {
@@ -175,7 +170,6 @@ const DetailsScreen = ({ route }) => {
             favoritesArray.push(pokemon);
             AsyncStorage.setItem("favorites", JSON.stringify(favoritesArray));
           }
-          console.log(favoritesArray)
         } else {
           const pokemon = { id: data.id, name: data.name, url: `https://pokeapi.co/api/v2/pokemon/${data.id}/` }; // Ajoutez l'URL du Pokémon ici
           AsyncStorage.setItem("favorites", JSON.stringify([pokemon]));

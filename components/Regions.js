@@ -2,9 +2,6 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 
 const Regions = ({ name, generation }) => {
-    console.log(name);
-    console.log(generation);
-
     const style = styles;
 
     const [regions, setRegions] = useState([]);

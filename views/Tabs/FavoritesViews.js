@@ -7,6 +7,8 @@ import { eventEmitter } from '../../assets/js/eventEmmiter';
 
 
 const FavoritesViews = () => {
+  const style = styles;
+
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
@@ -15,7 +17,6 @@ const FavoritesViews = () => {
       if (storedFavorites !== null) {
         setFavorites(JSON.parse(storedFavorites));
       }
-      console.log('fetchFavorites : ', storedFavorites)
     };
 
     const refreshFavorites = () => {
@@ -34,6 +35,9 @@ const FavoritesViews = () => {
 
   return (
     <View style={styles.body}>
+      <View style={style.containerTitle}>
+        <Text style={style.containerTitle.title}>Favoris</Text>
+      </View>
       <FlatList
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
@@ -50,11 +54,32 @@ const FavoritesViews = () => {
 };
 
 const styles = StyleSheet.create({
+  containerTitle: {
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0, 0, 0, 0.1)",
+    width: "100%",
+    paddingBottom: 30,
+    paddingLeft: 20,
+
+    title: {
+      marginTop: 70,
+      fontSize: 24,
+      fontFamily: "poppins-semi-bold",
+    },
+  },
+
   body: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+
+    list: {
+      paddingTop: 20,
+      marginLeft: "auto",
+      marginRight: "auto",
+      overflow: "hidden",
+    }
   },
 });
 
