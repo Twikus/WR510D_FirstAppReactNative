@@ -34,14 +34,14 @@ const FavoritesViews = () => {
   }, []);
 
   return (
-    <View style={styles.body}>
+    <View style={style.body}>
       <View style={style.containerTitle}>
         <Text style={style.containerTitle.title}>Favoris</Text>
       </View>
       <FlatList
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
-        style={styles.body.list}
+        style={style.body.list}
         numColumns={1}
         data={favorites} // Utilisez les favoris comme données
         renderItem={({ item }) => (
