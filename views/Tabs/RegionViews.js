@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import Regions from "../../components/Regions";
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegionViews = () => {
 
@@ -28,6 +29,12 @@ const RegionViews = () => {
   };
 
   const fetchRegion = async () => {
+    let storedRegions = await AsyncStorage.getItem('regionsData');
+    if (storedRegions) {
+      setRegions(JSON.parse(storedRegions));
+      return;
+    }
+
     const generations = await fetchGenerations();
 
     let newRegions = [];
@@ -40,7 +47,10 @@ const RegionViews = () => {
         if (response.data.main_region) {
           newRegions.push({
             region: response.data.main_region,
-            generation: generation
+            generation: {
+              name: generation.name,
+              url: generation.url
+            }
           });
         }
       } catch (error) {
@@ -54,12 +64,17 @@ const RegionViews = () => {
     newRegions = newRegions.map(({ region, generation }) => {
       return {
         name: region.name.charAt(0).toUpperCase() + region.name.slice(1),
-        generation: generation.name.toUpperCase(),
+        generation: {
+          name: generation.name,
+          url: generation.url
+        },
       };
     });
 
     setRegions(newRegions);
+    await AsyncStorage.setItem('regionsData', JSON.stringify(newRegions));
   };
+  
   useEffect(() => {
     fetchRegion();
   }, []);

@@ -2,6 +2,9 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 
 const Regions = ({ name, generation }) => {
+    console.log(name);
+    console.log(generation);
+
     const style = styles;
 
     const [regions, setRegions] = useState([]);
@@ -50,7 +53,7 @@ const Regions = ({ name, generation }) => {
         <View style={style.body}>
             <View style={style.body.container}>
                 <Text style={style.body.container.name}>{name}</Text>
-                <Text style={style.body.container.generation}>{generation}</Text>
+                <Text style={style.body.container.generation}>{generation.toUpperCase()}</Text>
                 {renderRegions()}
             </View>
         </View>

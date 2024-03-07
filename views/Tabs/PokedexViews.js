@@ -23,12 +23,11 @@ const PokedexViews = () => {
     try {
       setIsLoading(true);
       const storedData = await AsyncStorage.getItem('pokemonData');
-      const storedOffset = await AsyncStorage.getItem('pokemonOffset');
-      if (storedData !== null && storedOffset !== null) {
+      if (storedData !== null) {
         const data = JSON.parse(storedData);
         setData(data);
         setFullData(data);
-        setOffset(parseInt(storedOffset));
+        setOffset(data.length); // Utilisez la longueur des données pour définir l'offset
       } else {
         const response = await axios.get(`${API_ENDPOINT}?offset=${offset}&limit=20`);
         setData(response.data.results);

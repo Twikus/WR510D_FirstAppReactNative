@@ -1,25 +1,96 @@
 import { View, Image, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 
 const OnBoarding = () => {
   const style = styles.container;
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const clearPokemonData = async () => {
+  const API_ENDPOINT = "https://pokeapi.co/api/v2/";
+
+  const fetchGenerations = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`${API_ENDPOINT}/generation`);
+      return response.data.results;
+    } catch (error) {
+      setError(error);
+      console.log('generations :' + error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchRegion = async () => {
+    let storedRegions = await AsyncStorage.getItem('regionsData');
+    if (storedRegions) {
+      return;
+    }
+
+    const generations = await fetchGenerations();
+
+    let newRegions = [];
+
+    for (const generation of generations) {
       try {
-        await AsyncStorage.removeItem('pokemonData');
-      } catch (e) {
-        // Gérer les erreurs éventuelles ici
-        console.error(e);
+        setIsLoading(true);
+        const response = await axios.get(generation.url);
+
+        if (response.data.main_region) {
+          newRegions.push({
+            region: response.data.main_region,
+            generation: {
+              name: generation.name,
+              url: generation.url
+            }
+          });
+        }
+      } catch (error) {
+        setError(error);
+        console.log('regions :' + error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    newRegions = newRegions.map(({ region, generation }) => {
+      return {
+        name: region.name.charAt(0).toUpperCase() + region.name.slice(1),
+        generation: generation.name,
+      };
+    });
+
+    await AsyncStorage.setItem('regionsData', JSON.stringify(newRegions));
+  };
+
+  useEffect(() => {
+    AsyncStorage.clear();
+
+    const fetchInitialData = async () => {
+      try {
+        const storedPokemon = await AsyncStorage.getItem('pokemonData');
+        const storedRegions = await AsyncStorage.getItem('regionsData');
+
+        if (storedPokemon === null) {
+          const pokemonResponse = await axios.get(`${API_ENDPOINT}pokemon?offset=0&limit=20`);
+          const pokemonData = pokemonResponse.data.results;
+          await AsyncStorage.setItem('pokemonData', JSON.stringify(pokemonData));
+        }
+
+        await fetchRegion();
+      } catch (error) {
+        console.log(error);
       }
     };
 
-    clearPokemonData();
+    fetchInitialData();
   }, []);
 
   return (

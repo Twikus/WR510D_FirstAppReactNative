@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const TitlePokemon = ({ name, url }) => {
   const id = url.split("/")[url.split("/").length - 2];
+  console.log("url", url);
   const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
   const typeImages = {
     water: require("../assets/img/types/water.png"),

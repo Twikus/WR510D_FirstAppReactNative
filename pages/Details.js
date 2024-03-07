@@ -6,6 +6,8 @@ import { colors } from "../assets/styles/variables";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Icon } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { eventEmitter } from '../assets/js/eventEmmiter';
 
 const DetailsScreen = ({ route }) => {
   const style = styles.container;
@@ -55,7 +57,30 @@ const DetailsScreen = ({ route }) => {
 
   const [data, setData] = useState([]);
   const [species, setSpecies] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [mainType, setMainType] = useState("");
+
+  useEffect(() => {
+    const fetchFavorite = async () => {
+      try {
+        const favorites = await AsyncStorage.getItem("favorites");
+        if (favorites) {
+          const favoritesArray = JSON.parse(favorites);
+          console.log(favoritesArray);
+          if (favoritesArray.some(fav => fav.id === id)) {
+            setIsFavorite(true);
+          }
+        }
+      }
+      catch (error) {
+        console.log(error);
+      }
+
+      console.log(isFavorite);
+    };
+
+    fetchFavorite();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,7 +143,55 @@ const DetailsScreen = ({ route }) => {
 
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
-}
+  }
+
+  function removeFavorite() {
+    AsyncStorage.getItem("favorites").then((favorites) => {
+      if (favorites) {
+        const favoritesArray = JSON.parse(favorites);
+        const index = favoritesArray.findIndex(fav => fav.id === id);
+        if (index > -1) {
+          favoritesArray.splice(index, 1);
+          AsyncStorage.setItem("favorites", JSON.stringify(favoritesArray));
+        }
+      }
+    }).then(() => {
+      eventEmitter.emit('refreshFavorites');
+    });
+
+    console.log("removed : ", id);
+  }
+
+  function addFavorite() {
+    setIsFavorite(!isFavorite);
+    if(isFavorite) {
+      removeFavorite();
+    } else {
+      AsyncStorage.getItem("favorites").then((favorites) => {
+        if (favorites) {
+          const favoritesArray = JSON.parse(favorites);
+          const pokemon = { id: data.id, name: data.name, url: `https://pokeapi.co/api/v2/pokemon/${data.id}/` }; // Ajoutez l'URL du Pokémon ici
+          if (!favoritesArray.some(fav => fav.name === pokemon.name)) {
+            favoritesArray.push(pokemon);
+            AsyncStorage.setItem("favorites", JSON.stringify(favoritesArray));
+          }
+          console.log(favoritesArray)
+        } else {
+          const pokemon = { id: data.id, name: data.name, url: `https://pokeapi.co/api/v2/pokemon/${data.id}/` }; // Ajoutez l'URL du Pokémon ici
+          AsyncStorage.setItem("favorites", JSON.stringify([pokemon]));
+        }
+      })
+      eventEmitter.emit('refreshFavorites');
+    }
+  }
+
+  const renderFavoriteButton = () => {
+    if (isFavorite) {
+      return <Icon source="heart" color="#f00" size={20} />;
+    } else {
+      return <Icon source="heart" color="#fff" size={20} />;
+    }
+  }
 
   const renderTypes = () => {
     if (data.types && data.types.length > 0) {
@@ -189,6 +262,14 @@ const DetailsScreen = ({ route }) => {
           >
             <Text style={style.header.top.backBtn.text}>
               <Icon source="arrow-left" color="#fff" size={20} />
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={style.header.top.favoriteBtn}
+            onPress={() => addFavorite()}
+          >
+            <Text style={style.header.top.favoriteBtn.text}>
+              {renderFavoriteButton()}
             </Text>
           </TouchableOpacity>
         </View>
@@ -281,11 +362,29 @@ const styles = StyleSheet.create({
 
       top: {
         height: 100,
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingTop: 20,
         paddingLeft: 20,
+        paddingRight: 20,
 
         backBtn: {
+          width: 50,
+          height: 50,
+          borderRadius: 50,
+          backgroundColor: "transparent",
+          justifyContent: "center",
+          alignItems: "center",
+
+          text: {
+            fontFamily: "poppins-bold",
+            fontSize: 30,
+            color: "#fff",
+          },
+        },
+
+        favoriteBtn: {
           width: 50,
           height: 50,
           borderRadius: 50,
